@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="so.sao.shop.supplier.dao.CommImgeDao">
+    <sql id="baseColumns">
+        id,
+        sc_id AS  scId,
+        name,
+        url,
+        type,
+        size,
+        thumbnail_url AS thumbnailUrl
+    </sql>
+
+    <select id="find" resultType="so.sao.shop.supplier.domain.CommImge">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM comm_imge WHERE sc_id = #{scId}
+    </select>
+
+    <!--根据scId查询图片id集合-->
+    <select id="findIdsByScId" resultType="Long">
+        SELECT
+        id
+        FROM comm_imge WHERE sc_id = #{scId}
+    </select>
+
+    <select id="findOne" resultType="so.sao.shop.supplier.domain.CommImge">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM comm_imge WHERE id=#{id}
+    </select>
+    <insert id="save"   useGeneratedKeys="true" keyProperty="id">
+        insert comm_imge (
+        sc_id,
+        name,
+        url,
+        type,
+        size,
+        thumbnail_url
+        )VALUES (
+        #{scId},
+        #{name},
+        #{url},
+        #{type},
+        #{size},
+        #{thumbnailUrl}
+        )
+    </insert>
+
+    <!--批量新增图片-->
+    <insert id="batchSave" parameterType="java.util.List">
+        insert comm_imge (
+        sc_id,
+        name,
+        thumbnail_url,
+        url,
+        type,
+        size
+        )VALUES
+        <foreach collection ="list" item="data" index= "index" separator =",">
+            (
+            #{data.scId},
+            #{data.name},
+            #{data.thumbnailUrl},
+            #{data.url},
+            #{data.type},
+            #{data.size}
+            )
+        </foreach>
+    </insert>
+
+    <update id="update">
+        UPDATE comm_imge SET name=#{name},url = #{url},type = #{type},size = #{size} WHERE id = #{id}
+    </update>
+
+    <delete id="deleteByIds">
+        DELETE FROM comm_imge
+        WHERE id IN
+        <foreach collection="ids" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

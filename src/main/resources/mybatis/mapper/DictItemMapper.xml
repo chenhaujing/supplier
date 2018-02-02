@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="so.sao.shop.supplier.dao.DictItemMapper" >
+  <resultMap id="BaseResultMap" type="so.sao.shop.supplier.domain.DictItem" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="dict_type" property="dictType" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" />
+  </resultMap>
+
+  <select id="selectBank" resultType="java.lang.String" >
+    select name from dict_item where dict_type = 1
+  </select>
+
+  <select id="selectHangYe" resultType="java.lang.String" >
+    select name from dict_item where dict_type = 3
+  </select>
+
+  <select id="selectHangYeDict" resultMap="BaseResultMap" >
+    select name, code from dict_item where dict_type = 3
+  </select>
+
+  <select id="selectExpress" resultMap="BaseResultMap" >
+    select name, code from dict_item where dict_type = 4
+  </select>
+</mapper>

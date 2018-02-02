@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="so.sao.shop.supplier.dao.CommodityDao">
+    <sql id="baseColumns">
+          id,
+          brand_id AS brandId,
+          name
+    </sql>
+    <select id="findOne" resultType="so.sao.shop.supplier.domain.Commodity">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM commodity WHERE id=#{id}
+    </select>
+
+    <select id="findByCode69" resultType="so.sao.shop.supplier.pojo.output.CommodityInfoOutput">
+        SELECT
+        comm.id AS id,
+        comm.code69 AS code69,
+        b.name AS brandName,
+        comm.name AS NAME,
+        comm.category_one_id AS categoryOneId,
+        comm.category_two_id AS categoryTwoId,
+        comm.category_three_id AS categoryThreeId,
+        comm.company_name AS companyName,
+        comm.origin_place AS originPlace,
+        comm.market_time AS marketTime,
+        comm.created_at AS createdAt,
+        comm.created_by AS createdBy,
+        comm.updated_at AS updatedAt,
+        comm.updated_by AS updatedBy,
+        (SELECT NAME FROM comm_category WHERE id = comm.category_one_id) AS categoryOneName,
+        (SELECT NAME FROM comm_category WHERE id = comm.category_two_id) AS categoryTwoName,
+        (SELECT NAME FROM comm_category WHERE id = comm.category_three_id) AS categoryThreeName
+        FROM commodity comm
+        LEFT JOIN comm_brand b ON comm.brand_id=b.id
+        WHERE code69 = #{code69}
+    </select>
+    <!--根据code69查询商品信息-->
+    <select id="findCommInfoByCode69" resultType="so.sao.shop.supplier.domain.Commodity">
+        SELECT
+        id,
+        code69,
+        name,
+        category_one_id AS categoryOneId,
+        category_two_id AS categoryTwoId,
+        category_three_id AS categoryThreeId,
+        company_name AS companyName,
+        origin_place AS originPlace,
+        market_time AS marketTime,
+        created_at AS createdAt,
+        created_by AS createdBy,
+        updated_at AS updatedAt,
+        updated_by AS updatedBy
+        FROM commodity
+        WHERE code69 = #{code69}
+    </select>
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        insert commodity (
+            brand_id,
+            name,
+            code69,
+            category_one_id,
+            category_two_id,
+            category_three_id,
+            company_name,
+            origin_place,
+            market_time,
+            created_by,
+            created_at,
+            updated_by,
+            updated_at
+        )VALUES (
+            #{brandId},
+            #{name},
+            #{code69},
+            #{categoryOneId},
+            #{categoryTwoId},
+            #{categoryThreeId},
+            #{companyName},
+            #{originPlace},
+            #{marketTime},
+            #{createdBy},
+            #{createdAt},
+            #{updatedBy},
+            #{updatedAt}
+        )
+    </insert>
+    <update id="update">
+        UPDATE commodity SET name=#{name},brand_id = #{brandId} WHERE id = #{id}
+    </update>
+    <select id="findByIds" resultType="so.sao.shop.supplier.pojo.output.CommodityExportOutput">
+        SELECT
+            sc.id AS id,
+            IFNULL(sc.sku,'') AS sku,
+            IFNULL(sc.code69,'') AS code69,
+            IFNULL(cb.name,'') AS brandName,
+            IFNULL(ct.name,'') AS tagName,
+            IFNULL(cc.name,'') AS commName,
+            IFNULL(sc.code,'') AS supplierCode,
+            IFNULL(cu.name,'') AS unitName,
+            IFNULL(cms.name,'') AS measureSpecName,
+            IFNULL(sc.rule_val,'') AS ruleValue,
+            sc.price AS price,
+            sc.unit_price AS unitPrice,
+            sc.inventory AS inventory,
+            sc.status AS status,
+            IFNULL(sc.created_at,'') AS createdAt,
+            IFNULL(sc.updated_at,'') AS updatedAt,
+            IFNULL(cc.company_name,'') AS companyName,
+            IFNULL(cc.origin_place,'') AS originPlace,
+            IFNULL(cc.market_time,'') AS marketTime
+        FROM supplier_commodity sc INNER JOIN (commodity c LEFT JOIN comm_brand cb on c.brand_id = cb.id) on sc.code69 = c.code69
+        LEFT JOIN comm_measure_spec cms on sc.measure_spec_id = cms.id LEFT JOIN comm_unit cu on sc.unit_id = cu.id  LEFT JOIN comm_tag ct on sc.tag_id = ct.id  LEFT JOIN commodity cc on sc.code69 = cc.code69
+        WHERE sc.deleted = 0
+        AND sc.supplier_id = #{supplierId}
+        <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(commCode69)">
+            AND sc.code69 = #{commCode69}
+        </if>
+        <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(commCodeOrName)">
+            AND (sc.code69 = #{commCodeOrName}
+            OR c.name LIKE "%${commCodeOrName}%")
+        </if>
+        <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(sku)">
+            AND sc.sku = #{sku}
+        </if>
+        <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(suppCommCode)">
+            AND sc.code = #{suppCommCode}
+        </if>
+        <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(commName)">
+            AND c.name LIKE "%${commName}%"
+        </if>
+        <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(status)">
+            AND sc.status = #{status}
+        </if>
+        <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(minPrice) and @so.sao.shop.supplier.util.Ognl@isEmpty(maxPrice)">
+            AND sc.price<![CDATA[ >= #{minPrice}]]>
+        </if>
+        <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(maxPrice) and @so.sao.shop.supplier.util.Ognl@isEmpty(minPrice)">
+            AND  sc.price<![CDATA[<= #{maxPrice}]]>
+        </if>
+        <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(minPrice) and @so.sao.shop.supplier.util.Ognl@isNotEmpty(maxPrice)">
+            AND sc.price BETWEEN #{minPrice}
+            AND #{maxPrice}
+        </if>
+        <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(typeId)">
+            AND c.category_one_id = #{typeId}
+        </if>
+        <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(beginCreateAt) and @so.sao.shop.supplier.util.Ognl@isEmpty(endCreateAt)">
+            AND Date(sc.created_at)<![CDATA[ >= #{beginCreateAt}]]>
+        </if>
+        <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(endCreateAt) and @so.sao.shop.supplier.util.Ognl@isEmpty(beginCreateAt)">
+            AND  Date(sc.created_at)<![CDATA[<= #{endCreateAt}]]>
+        </if>
+        <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(beginCreateAt) and @so.sao.shop.supplier.util.Ognl@isNotEmpty(endCreateAt)">
+            AND Date(sc.created_at) BETWEEN #{beginCreateAt}
+            AND #{endCreateAt}
+        </if>
+        ORDER BY sc.updated_at DESC ,sc.id DESC
+    </select>
+</mapper>

@@ -1,0 +1,854 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="so.sao.shop.supplier.dao.AccountDao" >
+  <resultMap id="BaseResultMap" type="so.sao.shop.supplier.domain.Account" >
+    <id column="account_id" property="accountId" jdbcType="BIGINT" />
+    <result column="user_id" property="userId" jdbcType="BIGINT" />
+    <result column="provider_name" property="providerName" jdbcType="VARCHAR" />
+    <result column="responsible" property="responsible" jdbcType="VARCHAR" />
+    <result column="responsible_phone" property="responsiblePhone" jdbcType="VARCHAR" />
+    <result column="license" property="license" jdbcType="VARCHAR" />
+    <result column="license_time_create" property="licenseTimeCreate" />
+    <result column="license_time_end" property="licenseTimeEnd"  />
+    <result column="business_type" property="businessType" jdbcType="VARCHAR" />
+    <result column="regist_address" property="registAddress" jdbcType="VARCHAR" />
+    <result column="regist_address_province" property="registAddressProvince" jdbcType="VARCHAR" />
+    <result column="regist_address_city" property="registAddressCity" jdbcType="VARCHAR" />
+    <result column="regist_address_district" property="registAddressDistrict" jdbcType="VARCHAR" />
+    <result column="register_address_detail" property="registerAddressDetail" jdbcType="VARCHAR" />
+    <result column="discount" property="discount" jdbcType="VARCHAR" />
+    <result column="bank_name" property="bankName" jdbcType="VARCHAR" />
+    <result column="bank_num" property="bankNum" jdbcType="VARCHAR" />
+    <result column="bank_user_name" property="bankUserName" jdbcType="VARCHAR" />
+    <result column="contract_create_date" property="contractCreateDate" />
+    <result column="contract_end_date" property="contractEndDate"  />
+    <result column="remittance_type" property="remittanceType" jdbcType="VARCHAR" />
+    <result column="remittanced" property="remittanced" jdbcType="VARCHAR" />
+    <result column="account_status" property="accountStatus" jdbcType="INTEGER" />
+    <result column="create_date" property="createDate"  />
+    <result column="update_date" property="updateDate" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="balance" property="balance" jdbcType="DOUBLE" />
+    <result column="income" property="income" jdbcType="DOUBLE" />
+    <result column="contract_responsible" property="contractResponsible" jdbcType="VARCHAR" />
+    <result column="contract_responsible_phone" property="contractResponsiblePhone" jdbcType="VARCHAR" />
+    <result column="contract_license" property="contractLicense" jdbcType="VARCHAR" />
+    <result column="contract_license_create" property="contractLicenseCreate" />
+    <result column="contract_license_end" property="contractLicenseEnd" />
+    <result column="contract_register_address" property="contractRegisterAddress" jdbcType="VARCHAR" />
+    <result column="contract_register_address_province" property="contractRegisterAddressProvince" jdbcType="VARCHAR" />
+    <result column="contract_register_address_city" property="contractRegisterAddressCity" jdbcType="VARCHAR" />
+    <result column="contract_register_address_district" property="contractRegisterAddressDistrict" jdbcType="VARCHAR" />
+    <result column="contract_register_address_detail" property="contractRegisterAddressDetail" jdbcType="VARCHAR" />
+    <result column="upload_mode" property="uploadMode" jdbcType="VARCHAR" />
+    <result column="sms_code" property="smsCode" jdbcType="VARCHAR" />
+    <result column="contract_original_name" property="contractOriginalName" jdbcType="VARCHAR" />
+    <result column="contract_original" property="contractOriginal" jdbcType="VARCHAR" />
+    <result column="service_phone" property="servicePhone" jdbcType="VARCHAR" />
+    <result column="contract_name" property="contractName" jdbcType="VARCHAR" />
+    <result column="sms_monthago_type" property="monthAgoType" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    account_id,
+    user_id,
+    provider_name,
+    responsible,
+    responsible_phone,
+    license,
+    license_time_create,
+    license_time_end,
+    regist_address,
+    register_address_detail,
+    discount,
+    bank_name,
+    bank_num,
+    bank_user_name,
+    contract_create_date,
+    contract_end_date,
+    remittance_type,
+    remittanced,
+    account_status,
+    create_date,
+    update_date,
+    remark,
+    balance,
+    income,
+    contract_responsible,
+    contract_responsible_phone,
+    contract_license,
+    contract_license_create,
+    contract_license_end,
+    contract_register_address,
+    contract_register_address_detail,
+    upload_mode,
+    sms_code,
+    contract_original_name,
+    contract_original,
+    service_phone,
+    contract_name
+  </sql>
+
+  <!-- 查询出省市区汉字字段-->
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />, dict.name business_type ,p.name regist_address_province,
+    c.name regist_address_city,d.name regist_address_district,
+    cp.name contract_register_address_province,    cc.name contract_register_address_city,
+    cd.name contract_register_address_district
+    from account, sys_region p, sys_region c, sys_region d
+    , sys_region cp, sys_region cc, sys_region cd, dict_item dict
+   where account_id = #{accountId,jdbcType=BIGINT}
+     and regist_address_province = p.sr_id
+     and regist_address_city = c.sr_id
+     and regist_address_district = d.sr_id
+     and contract_register_address_province = cp.sr_id
+     and contract_register_address_city = cc.sr_id
+     and contract_register_address_district = cd.sr_id
+     and dict.code = business_type
+     and dict.dict_type = 3
+  </select>
+
+  <!-- 查询出省市区编码字段-->
+  <select id="selectById" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select
+    <include refid="Base_Column_List" />, business_type ,regist_address_province,
+    regist_address_city, regist_address_district,
+    contract_register_address_province, contract_register_address_city,
+    contract_register_address_district
+    from account, sys_region p, sys_region c, sys_region d
+    , sys_region cp, sys_region cc, sys_region cd
+    where account_id = #{accountId,jdbcType=BIGINT}
+    and regist_address_province = p.sr_id
+    and regist_address_city = c.sr_id
+    and regist_address_district = d.sr_id
+    and contract_register_address_province = cp.sr_id
+    and contract_register_address_city = cc.sr_id
+    and contract_register_address_district = cd.sr_id
+  </select>
+
+  <update id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    update account
+    set account_status = 0
+    where account_id = #{accountId,jdbcType=BIGINT}
+  </update>
+
+  <insert id="insert" parameterType="so.sao.shop.supplier.domain.Account" >
+    insert into account (account_id, user_id, provider_name,
+      responsible, responsible_phone, license, 
+      license_time_create, license_time_end, business_type, 
+      regist_address,regist_address_province,regist_address_city,
+      regist_address_district, register_address_detail, discount,
+      bank_name, bank_num, bank_user_name, 
+      contract_create_date, contract_end_date, remittance_type, 
+      remittanced, account_status, create_date, 
+      update_date, remark, balance, 
+      income, contract_responsible, contract_responsible_phone, 
+      contract_license, contract_license_create, 
+      contract_license_end, contract_register_address,
+       contract_register_address_province,contract_register_address_city,
+       contract_register_address_district,
+      contract_register_address_detail, upload_mode, 
+      sms_code,contract_original_name,contract_original,last_settlement_date,service_phone,contract_name,sms_monthago_type)
+    values (#{accountId,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{providerName,jdbcType=VARCHAR}, 
+      #{responsible,jdbcType=VARCHAR}, #{responsiblePhone,jdbcType=VARCHAR}, #{license,jdbcType=VARCHAR}, 
+      #{licenseTimeCreate}, #{licenseTimeEnd}, #{businessType,jdbcType=VARCHAR},
+      #{registAddress,jdbcType=VARCHAR},#{registAddressProvince,jdbcType=VARCHAR},#{registAddressCity,jdbcType=VARCHAR},#{registAddressDistrict,jdbcType=VARCHAR},
+       #{registerAddressDetail,jdbcType=VARCHAR}, #{discount,jdbcType=VARCHAR},
+      #{bankName,jdbcType=VARCHAR}, #{bankNum,jdbcType=VARCHAR}, #{bankUserName,jdbcType=VARCHAR}, 
+      #{contractCreateDate}, #{contractEndDate}, #{remittanceType,jdbcType=VARCHAR},
+      #{remittanced,jdbcType=VARCHAR}, #{accountStatus,jdbcType=INTEGER}, #{createDate},
+      #{updateDate}, #{remark,jdbcType=VARCHAR}, #{balance,jdbcType=DOUBLE},
+      #{income,jdbcType=DOUBLE}, #{contractResponsible,jdbcType=VARCHAR}, #{contractResponsiblePhone,jdbcType=VARCHAR}, 
+      #{contractLicense,jdbcType=VARCHAR}, #{contractLicenseCreate},
+      #{contractLicenseEnd},#{contractRegisterAddress,jdbcType=VARCHAR}, #{contractRegisterAddressProvince,jdbcType=VARCHAR},
+      #{contractRegisterAddressCity,jdbcType=VARCHAR}, #{contractRegisterAddressDistrict,jdbcType=VARCHAR},
+      #{contractRegisterAddressDetail,jdbcType=VARCHAR}, #{uploadMode,jdbcType=VARCHAR}, 
+      #{smsCode,jdbcType=VARCHAR},#{contractOriginalName,jdbcType=VARCHAR},#{contractOriginal,jdbcType=VARCHAR},#{lastSettlementDate},#{servicePhone},#{contractName},#{monthAgoType})
+  </insert>
+
+  <!-- <insert id="insertSelective" parameterType="so.sao.shop.supplier.domain.Account" >
+    insert into account
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="accountId != null" >
+        account_id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="providerName != null" >
+        provider_name,
+      </if>
+      <if test="responsible != null" >
+        responsible,
+      </if>
+      <if test="responsiblePhone != null" >
+        responsible_phone,
+      </if>
+      <if test="license != null" >
+        license,
+      </if>
+      <if test="licenseTimeCreate != null" >
+        license_time_create,
+      </if>
+      <if test="licenseTimeEnd != null" >
+        license_time_end,
+      </if>
+      <if test="businessType != null" >
+        business_type,
+      </if>
+      <if test="registAddress != null" >
+        regist_address,
+      </if>
+      <if test="registAddressProvince != null" >
+        regist_address_province,
+      </if>
+      <if test="registAddressCity != null" >
+        regist_address_city,
+      </if>
+      <if test="registAddressDistrict != null" >
+        regist_address_district,
+      </if>
+      <if test="registerAddressDetail != null" >
+        register_address_detail,
+      </if>
+      <if test="discount != null" >
+        discount,
+      </if>
+      <if test="bankName != null" >
+        bank_name,
+      </if>
+      <if test="bankNum != null" >
+        bank_num,
+      </if>
+      <if test="bankUserName != null" >
+        bank_user_name,
+      </if>
+      <if test="contractCreateDate != null" >
+        contract_create_date,
+      </if>
+      <if test="contractEndDate != null" >
+        contract_end_date,
+      </if>
+      <if test="remittanceType != null" >
+        remittance_type,
+      </if>
+      <if test="remittanced != null" >
+        remittanced,
+      </if>
+      <if test="accountStatus != null" >
+        account_status,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="balance != null" >
+        balance,
+      </if>
+      <if test="income != null" >
+        income,
+      </if>
+      <if test="contractResponsible != null" >
+        contract_responsible,
+      </if>
+      <if test="contractResponsiblePhone != null" >
+        contract_responsible_phone,
+      </if>
+      <if test="contractLicense != null" >
+        contract_license,
+      </if>
+      <if test="contractLicenseCreate != null" >
+        contract_license_create,
+      </if>
+      <if test="contractLicenseEnd != null" >
+        contract_license_end,
+      </if>
+      <if test="contractRegisterAddress != null" >
+        contract_register_address,
+      </if>
+      <if test="contractRegisterAddressProvince != null" >
+        contract_register_address_province,
+      </if>
+      <if test="contractRegisterAddressCity != null" >
+        contract_register_address_city,
+      </if>
+      <if test="contractRegisterAddressDistrict != null" >
+        contract_register_address_district,
+      </if>
+      <if test="contractRegisterAddressDetail != null" >
+        contract_register_address_detail,
+      </if>
+      <if test="uploadMode != null" >
+        upload_mode,
+      </if>
+      <if test="smsCode != null" >
+        sms_code,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="accountId != null" >
+        #{accountId,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="providerName != null" >
+        #{providerName,jdbcType=VARCHAR},
+      </if>
+      <if test="responsible != null" >
+        #{responsible,jdbcType=VARCHAR},
+      </if>
+      <if test="responsiblePhone != null" >
+        #{responsiblePhone,jdbcType=VARCHAR},
+      </if>
+      <if test="license != null" >
+        #{license,jdbcType=VARCHAR},
+      </if>
+      <if test="licenseTimeCreate != null" >
+        #{licenseTimeCreate},
+      </if>
+      <if test="licenseTimeEnd != null" >
+        #{licenseTimeEnd},
+      </if>
+      <if test="businessType != null" >
+        #{businessType,jdbcType=VARCHAR},
+      </if>
+      <if test="registAddress != null" >
+        #{registAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="registAddressProvince != null" >
+        #{registAddressProvince,jdbcType=VARCHAR},
+      </if>
+      <if test="registAddressCity != null" >
+        #{registAddressCity,jdbcType=VARCHAR},
+      </if>
+      <if test="registAddressDistrict != null" >
+        #{registAddressDistrict,jdbcType=VARCHAR},
+      </if>
+      <if test="registerAddressDetail != null" >
+        #{registerAddressDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="discount != null" >
+        #{discount,jdbcType=VARCHAR},
+      </if>
+      <if test="bankName != null" >
+        #{bankName,jdbcType=VARCHAR},
+      </if>
+      <if test="bankNum != null" >
+        #{bankNum,jdbcType=VARCHAR},
+      </if>
+      <if test="bankUserName != null" >
+        #{bankUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="contractCreateDate != null" >
+        #{contractCreateDate},
+      </if>
+      <if test="contractEndDate != null" >
+        #{contractEndDate},
+      </if>
+      <if test="remittanceType != null" >
+        #{remittanceType,jdbcType=VARCHAR},
+      </if>
+      <if test="remittanced != null" >
+        #{remittanced,jdbcType=VARCHAR},
+      </if>
+      <if test="accountStatus != null" >
+        #{accountStatus,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null" >
+        #{createDate},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="balance != null" >
+        #{balance,jdbcType=DOUBLE},
+      </if>
+      <if test="income != null" >
+        #{income,jdbcType=DOUBLE},
+      </if>
+      <if test="contractResponsible != null" >
+        #{contractResponsible,jdbcType=VARCHAR},
+      </if>
+      <if test="contractResponsiblePhone != null" >
+        #{contractResponsiblePhone,jdbcType=VARCHAR},
+      </if>
+      <if test="contractLicense != null" >
+        #{contractLicense,jdbcType=VARCHAR},
+      </if>
+      <if test="contractLicenseCreate != null" >
+        #{contractLicenseCreate,jdbcType=BIGINT},
+      </if>
+      <if test="contractLicenseEnd != null" >
+        #{contractLicenseEnd,jdbcType=BIGINT},
+      </if>
+      <if test="contractRegisterAddress != null" >
+        #{contractRegisterAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="contractRegisterAddressProvince != null" >
+        #{contractRegisterAddressProvince,jdbcType=VARCHAR},
+      </if>
+      <if test="contractRegisterAddressCity != null" >
+        #{contractRegisterAddressCity,jdbcType=VARCHAR},
+      </if>
+      <if test="contractRegisterAddressDistrict != null" >
+        #{contractRegisterAddressDistrict,jdbcType=VARCHAR},
+      </if>
+      <if test="contractRegisterAddressDetail != null" >
+        #{contractRegisterAddressDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadMode != null" >
+        #{uploadMode,jdbcType=VARCHAR},
+      </if>
+      <if test="smsCode != null" >
+        #{smsCode,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert> -->
+
+  <update id="updateByPrimaryKey" parameterType="so.sao.shop.supplier.domain.Account" >
+    update account
+    set user_id = #{userId,jdbcType=BIGINT},
+    provider_name = #{providerName,jdbcType=VARCHAR},
+    responsible = #{responsible,jdbcType=VARCHAR},
+    responsible_phone = #{responsiblePhone,jdbcType=VARCHAR},
+    license = #{license,jdbcType=VARCHAR},
+    license_time_create = #{licenseTimeCreate},
+    license_time_end = #{licenseTimeEnd},
+    business_type = #{businessType,jdbcType=VARCHAR},
+    regist_address = #{registAddress,jdbcType=VARCHAR},
+    regist_address_province = #{registAddressProvince,jdbcType=VARCHAR},
+    regist_address_city = #{registAddressCity,jdbcType=VARCHAR},
+    regist_address_district = #{registAddressDistrict,jdbcType=VARCHAR},
+    register_address_detail = #{registerAddressDetail,jdbcType=VARCHAR},
+    discount = #{discount,jdbcType=VARCHAR},
+    bank_name = #{bankName,jdbcType=VARCHAR},
+    bank_num = #{bankNum,jdbcType=VARCHAR},
+    bank_user_name = #{bankUserName,jdbcType=VARCHAR},
+    contract_create_date = #{contractCreateDate},
+    contract_end_date = #{contractEndDate},
+    remittance_type = #{remittanceType,jdbcType=VARCHAR},
+    remittanced = #{remittanced,jdbcType=VARCHAR},
+    account_status = #{accountStatus,jdbcType=INTEGER},
+    create_date = #{createDate},
+    update_date = #{updateDate},
+    remark = #{remark,jdbcType=VARCHAR},
+    balance = #{balance,jdbcType=DOUBLE},
+    income = #{income,jdbcType=DOUBLE},
+    contract_responsible = #{contractResponsible,jdbcType=VARCHAR},
+    contract_responsible_phone = #{contractResponsiblePhone,jdbcType=VARCHAR},
+    contract_license = #{contractLicense,jdbcType=VARCHAR},
+    contract_license_create = #{contractLicenseCreate,jdbcType=BIGINT},
+    contract_license_end = #{contractLicenseEnd,jdbcType=BIGINT},
+    contract_register_address = #{contractRegisterAddress,jdbcType=VARCHAR},
+    contract_register_address_province = #{contractRegisterAddressProvince,jdbcType=VARCHAR},
+    contract_register_address_city = #{contractRegisterAddressCity,jdbcType=VARCHAR},
+    contract_register_address_district = #{contractRegisterAddressDistrict,jdbcType=VARCHAR},
+    contract_register_address_detail = #{contractRegisterAddressDetail,jdbcType=VARCHAR},
+    upload_mode = #{uploadMode,jdbcType=VARCHAR},
+    sms_code = #{smsCode,jdbcType=VARCHAR},
+    sms_monthago_type = #{monthAgoType,jdbcType=INTEGER}
+    where account_id = #{accountId,jdbcType=BIGINT}
+  </update>
+
+  <update id="updateByPrimaryKeySelective" parameterType="so.sao.shop.supplier.domain.Account" >
+    update account
+    <set >
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="providerName != null" >
+        provider_name = #{providerName,jdbcType=VARCHAR},
+      </if>
+      <if test="responsible != null" >
+        responsible = #{responsible,jdbcType=VARCHAR},
+      </if>
+      <if test="responsiblePhone != null" >
+        responsible_phone = #{responsiblePhone,jdbcType=VARCHAR},
+      </if>
+      <if test="license != null" >
+        license = #{license,jdbcType=VARCHAR},
+      </if>
+      <if test="licenseTimeCreate != null" >
+        license_time_create = #{licenseTimeCreate},
+      </if>
+      <if test="licenseTimeEnd != null" >
+        license_time_end = #{licenseTimeEnd},
+      </if>
+      <if test="businessType != null" >
+        business_type = #{businessType,jdbcType=VARCHAR},
+      </if>
+      <if test="registAddress != null" >
+        regist_address = #{registAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="registAddressProvince != null" >
+        regist_address_province = #{registAddressProvince,jdbcType=VARCHAR},
+      </if>
+      <if test="registAddressCity != null" >
+        regist_address_city = #{registAddressCity,jdbcType=VARCHAR},
+      </if>
+      <if test="registAddressDistrict != null" >
+        regist_address_district = #{registAddressDistrict,jdbcType=VARCHAR},
+      </if>
+      <if test="registerAddressDetail != null" >
+        register_address_detail = #{registerAddressDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="discount != null" >
+        discount = #{discount,jdbcType=VARCHAR},
+      </if>
+      <if test="bankName != null" >
+        bank_name = #{bankName,jdbcType=VARCHAR},
+      </if>
+      <if test="bankNum != null" >
+        bank_num = #{bankNum,jdbcType=VARCHAR},
+      </if>
+      <if test="bankUserName != null" >
+        bank_user_name = #{bankUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="contractCreateDate != null" >
+        contract_create_date = #{contractCreateDate},
+      </if>
+      <if test="contractEndDate != null" >
+        contract_end_date = #{contractEndDate},
+      </if>
+      <if test="remittanceType != null" >
+        remittance_type = #{remittanceType,jdbcType=VARCHAR},
+      </if>
+      <if test="remittanced != null" >
+        remittanced = #{remittanced,jdbcType=VARCHAR},
+      </if>
+      <if test="accountStatus != null" >
+        account_status = #{accountStatus,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="balance != null" >
+        balance = #{balance,jdbcType=DOUBLE},
+      </if>
+      <if test="income != null" >
+        income = #{income,jdbcType=DOUBLE},
+      </if>
+      <if test="contractResponsible != null" >
+        contract_responsible = #{contractResponsible,jdbcType=VARCHAR},
+      </if>
+      <if test="contractResponsiblePhone != null" >
+        contract_responsible_phone = #{contractResponsiblePhone,jdbcType=VARCHAR},
+      </if>
+      <if test="contractLicense != null" >
+        contract_license = #{contractLicense,jdbcType=VARCHAR},
+      </if>
+      <if test="contractLicenseCreate != null" >
+        contract_license_create = #{contractLicenseCreate,jdbcType=BIGINT},
+      </if>
+      <if test="contractLicenseEnd != null" >
+        contract_license_end = #{contractLicenseEnd,jdbcType=BIGINT},
+      </if>
+      <if test="contractRegisterAddress != null" >
+        contract_register_address = #{contractRegisterAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="contractRegisterAddressProvince != null" >
+        contract_register_address_province = #{contractRegisterAddressProvince,jdbcType=VARCHAR},
+      </if>
+      <if test="contractRegisterAddressCity != null" >
+        contract_register_address_city = #{contractRegisterAddressCity,jdbcType=VARCHAR},
+      </if>
+      <if test="contractRegisterAddressDistrict != null" >
+        contract_register_address_district = #{contractRegisterAddressDistrict,jdbcType=VARCHAR},
+      </if>
+      <if test="contractRegisterAddressDetail != null" >
+        contract_register_address_detail = #{contractRegisterAddressDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadMode != null" >
+        upload_mode = #{uploadMode,jdbcType=VARCHAR},
+      </if>
+      <if test="smsCode != null" >
+        sms_code = #{smsCode,jdbcType=VARCHAR},
+      </if>
+      <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(contractOriginalName)">
+      	contract_original_name = #{contractOriginalName,jdbcType=VARCHAR},
+      </if>
+      <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(contractOriginal)">
+      	contract_original = #{contractOriginal,jdbcType=VARCHAR},
+      </if>
+      <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(servicePhone)">
+        service_phone = #{servicePhone,jdbcType=VARCHAR},
+      </if>
+      <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(contractName)">
+        contract_name = #{contractName,jdbcType=VARCHAR},
+      </if>
+      <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(monthAgoType)">
+        sms_monthago_type = #{monthAgoType,jdbcType=INTEGER}
+      </if>
+    </set>
+    where account_id = #{accountId,jdbcType=BIGINT}
+  </update>
+
+  <!--根据userId查询账户-->
+  <select id="findByUserId" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />, business_type,p.name regist_address_province,
+    c.name regist_address_city,d.name regist_address_district,cp.name contract_register_address_province,
+    cc.name contract_register_address_city,    cd.name contract_register_address_district
+    FROM account,sys_region p, sys_region c, sys_region d
+    , sys_region cp, sys_region cc, sys_region cd
+    WHERE user_id = #{userId}
+    and regist_address_province = p.sr_id
+    and regist_address_city = c.sr_id
+    and regist_address_district = d.sr_id
+    and contract_register_address_province = cp.sr_id
+    and contract_register_address_city = cc.sr_id
+    and contract_register_address_district = cd.sr_id
+  </select>
+
+  <!--根据用户id修改账余额、更新时间-->
+  <update id="updateAccountByUserId" parameterType="so.sao.shop.supplier.domain.Account">
+    UPDATE account
+    <set>
+      <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(balance)">
+        balance = #{balance},
+      </if>
+      <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(updateDate)">
+        update_date = #{updateDate},
+      </if>
+    </set>
+    WHERE account_id = #{accountId}
+  </update>
+
+  <!--根据账户表账户id,修改账户表中用户余额-->
+  <update id="updateUserBalance" parameterType="so.sao.shop.supplier.domain.Account">
+    UPDATE account
+    <set>
+      <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(balance)">
+        balance = #{balance},
+      </if>
+      <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(updateDate)">
+        update_date = #{updateDate},
+      </if>
+    </set>
+    WHERE account_id=#{accountId};
+  </update>
+
+  <select id="findPage" resultMap="BaseResultMap" parameterType="so.sao.shop.supplier.pojo.input.AccountInput">
+          SELECT a.contract_responsible,a.contract_create_date, a.account_id,a.user_id,a.create_date,a.provider_name, a.contract_end_date, a.contract_responsible_phone,p.name regist_address_province,
+                  c.name regist_address_city,d.name regist_address_district  ,cp.name contract_register_address_province,cc.name contract_register_address_city,
+                  cd.name contract_register_address_district,  a.contract_register_address, account_status
+            FROM account a,sys_region p, sys_region c, sys_region d, sys_region cp, sys_region cc, sys_region cd, user u
+            <where>
+              (account_status = 1 OR account_status = 2)
+              AND u.is_admin = 0
+              AND a.user_id = u.user_id
+              AND regist_address_province = p.sr_id
+              AND regist_address_city = c.sr_id
+              AND regist_address_district = d.sr_id
+              AND contract_register_address_province = cp.sr_id
+              AND contract_register_address_city = cc.sr_id
+              AND contract_register_address_district = cd.sr_id
+                <if test="beginDate != null ">
+                    AND STR_TO_DATE(DATE_FORMAT(a.create_date,'%Y-%c-%d'),'%Y-%m-%d') <![CDATA[>=]]> STR_TO_DATE(#{beginDate},'%Y-%m-%d')
+                </if>
+                <if test="endDate != null ">
+                    AND STR_TO_DATE(DATE_FORMAT(a.create_date,'%Y-%c-%d'),'%Y-%m-%d') <![CDATA[<=]]> STR_TO_DATE(#{endDate},'%Y-%m-%d')
+                </if>
+                <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(providerName)">
+                    AND provider_name LIKE "%${providerName}%"
+                </if>
+				<if test="contractCreateDate != null ">
+                    AND STR_TO_DATE(DATE_FORMAT(a.contract_end_date,'%Y-%c-%d'),'%Y-%m-%d') <![CDATA[>=]]> TRIM(STR_TO_DATE(#{contractCreateDate},'%Y-%m-%d'))
+                </if>
+                <if test="contractEndDate != null ">
+                    AND STR_TO_DATE(DATE_FORMAT(a.contract_end_date,'%Y-%c-%d'),'%Y-%m-%d') <![CDATA[<=]]> TRIM(STR_TO_DATE(#{contractEndDate},'%Y-%m-%d'))
+                </if>
+                <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(contractResponsible)">
+                    AND contract_responsible LIKE "%${contractResponsible}%"
+                </if>
+                <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(contractResponsiblePhone)">
+                    AND  contract_responsible_phone  LIKE "%${contractResponsiblePhone}%"
+                </if>
+                <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(contractRegisterAddressProvince)">
+                  AND  contract_register_address_province = #{contractRegisterAddressProvince}
+                </if>
+                <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(contractRegisterAddressCity)">
+                  AND  contract_register_address_city = #{contractRegisterAddressCity}
+                </if>
+                <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(contractRegisterAddressDistrict)">
+                  AND  contract_register_address_district = #{contractRegisterAddressDistrict} 
+                </if>
+                <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(vague)">
+                   AND  (contract_responsible LIKE "%${vague}%" or provider_name LIKE "%${vague}%")
+                 </if>
+    </where>
+             ORDER  BY  a.create_date DESC 
+  </select>
+
+    <select id="findOne" resultMap="BaseResultMap" parameterType="long">
+           SELECT account_id,user_id,provider_name,responsible,responsible_phone, license,
+                 license_time,business_type,regist_address, register_address_detail, discount,
+                 bank_name,bank_num,bank_user_name,contract_create_date,contract_end_date,
+                 AREA,area_detail,remittance_type,remittanced, account_status,create_date,
+                 update_date,remark, balance,income,contract_responsible,contract_responsible_phone,
+                 contract_license,contract_license_time,contract_register_address,
+                 contract_register_address_detail,service_phone
+            FROM
+              account
+           WHERE account_id = #{accountId}
+    </select>
+
+    <!-- 修改历史总收入 -->
+    <update id="updateUserPrice">
+      UPDATE account SET INCOME = #{account} WHERE account_id = #{storeId}
+    </update>
+    
+    <!-- 根据用户id查询供应商id -->
+    <select id="findAccountIdByUserId" parameterType="long" resultType="long">
+    	SELECT account_id 
+    	FROM   account 
+    	WHERE  user_id = #{userId}
+    </select>
+
+    <!-- 统计已入驻供应商数量总和 -->
+  <select id="findAccountNumber" resultType="int">
+    select COUNT(provider_name) FROM account AS a ,user AS u WHERE (account_status= 1 OR account_status= 2) AND a.user_id = u.user_id AND u.is_admin = 0
+  </select>
+
+  <!--查询出当天要结算的供应商信息列表-->
+  <select id="findAccountList" resultMap="findAccountListResultMap">
+    SELECT
+      account_id,
+      user_id,
+      provider_name,
+      bank_name,
+      bank_num,
+      bank_user_name,
+      remittance_type,
+      remittanced,
+      create_date,
+      last_settlement_date
+    FROM
+      account
+    WHERE remittanced = #{days} AND remittance_type = 1
+    UNION ALL
+    SELECT
+      account_id,
+      user_id,
+      provider_name,
+      bank_name,
+      bank_num,
+      bank_user_name,
+      remittance_type,
+      remittanced,
+      create_date,
+      last_settlement_date
+    FROM account
+    WHERE datediff(#{currentDate}, DATE(last_settlement_date))%remittanced = 0 AND remittance_type = 2;
+  </select>
+
+  <!--findAccountList()查询映射结果集-->
+  <resultMap id="findAccountListResultMap" type="so.sao.shop.supplier.domain.Account">
+    <id column="account_id" property="accountId" />
+    <result column="user_id" property="userId" />
+    <result column="provider_name" property="providerName" />
+    <result column="bank_name" property="bankName" />
+    <result column="bank_num" property="bankNum" />
+    <result column="bank_user_name" property="bankUserName" />
+    <result column="remittance_type" property="remittanceType" />
+    <result column="remittanced" property="remittanced" />
+    <result column="create_date" property="createDate" />
+    <result column="last_settlement_date" property="lastSettlementDate" />
+  </resultMap>
+
+  <!--批量更新上一次结算时间-->
+  <update id="updateAccountLastSettlementDate" parameterType="java.util.List">
+    <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+      UPDATE account
+      SET last_settlement_date = #{item.lastSettlementDate}, update_date = #{item.updateDate}
+      WHERE account_id = #{item.accountId}
+    </foreach>
+  </update>
+
+  <!-- 结算明细中根据商户id查询该商户 -->
+  <select id="findAccountByUserId" resultMap="BaseResultMap">
+    SELECT
+      <include refid="Base_Column_List" />
+    FROM
+      account
+    WHERE user_id = #{userId}
+  </select>
+  <!--根据账户ID查找是否存在该账户-->
+  <select id="countByAccountId" parameterType="java.lang.Long" resultType="java.lang.Integer">
+     SELECT COUNT(account_id)
+        FROM account
+        WHERE account_id = #{accountId}
+  </select>
+  <!--根据供应商id更新供应商状态-->
+  <update id="updateAccountStatusById" parameterType="so.sao.shop.supplier.pojo.input.AccountUpdateInput">
+    UPDATE account
+    SET account_status = #{accountStatus}, update_date = #{updateDate}
+    WHERE account_id = #{accountId}
+  </update>
+
+  <!--查询合同截止时间30天前的供应商-->
+  <select id="findMonthAgo" resultMap="BaseResultMap">
+    SELECT account_id,contract_responsible_phone FROM account
+    WHERE account_status = 1 AND sms_monthago_type = 0 AND DATE_FORMAT(contract_end_date,'%Y-%m-%d')=(DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 30 DAY),'%Y-%m-%d'))
+  </select>
+
+  <!--查询合同已过期供应商-->
+  <select id="findContractEndDate" resultMap="BaseResultMap">
+    SELECT account_id,contract_responsible_phone FROM account
+    WHERE account_status = 1 AND DATE_FORMAT(contract_end_date,'%Y-%m-%d')=DATE_FORMAT(NOW(),'%Y-%m-%d')
+  </select>
+
+  <!-- 根据accountId或providerName查询供应商信息-->
+  <select id="findAccounts" resultType="so.sao.shop.supplier.pojo.output.AccountOutput" >
+    SELECT
+    a.account_id AS accountId,
+    a.provider_name AS providerName,
+    a.responsible AS responsible,
+    a.responsible_phone AS responsiblePhone,
+    a.contract_end_date AS contractEndDate,
+    a.regist_address_province  AS registAddressProvince,
+    r.name AS registAddressProvinceName,
+    a.regist_address_city AS registAddressCity,
+    (SELECT NAME FROM sys_region r WHERE a.regist_address_city = r.sr_id) AS registAddressCityName,
+    a.regist_address_district AS registAddressDistrict,
+    (SELECT NAME FROM sys_region r WHERE a.regist_address_district = r.sr_id) AS registAddressDistrictName,
+    a.contract_register_address_province AS contractRegisterAddressProvince,
+    (SELECT NAME FROM sys_region r WHERE a.contract_register_address_province = r.sr_id) AS contractRegisterAddressProvinceName,
+    a.contract_register_address_city AS contractRegisterAddressCity,
+    (SELECT NAME FROM sys_region r WHERE a.contract_register_address_city = r.sr_id) AS contractRegisterAddressCityName,
+    a.contract_register_address_district AS contractRegisterAddressDistrict,
+    (SELECT NAME FROM sys_region r WHERE a.contract_register_address_district = r.sr_id) AS contractRegisterAddressDistrictName
+    FROM account a
+    LEFT JOIN sys_region r ON a.regist_address_province = r.sr_id
+    WHERE
+    a.account_status = 1
+    <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(providerName)">
+      AND a.provider_name LIKE '%${providerName}%'
+    </if>
+    <if test="@so.sao.shop.supplier.util.Ognl@isNotEmpty(accountId)">
+      AND a.account_id =#{accountId}
+    </if>
+  </select>
+
+  <!-- 根据供应商ID修改供应商合同剩余30天发送短信标记-->
+  <update id="updateAccountSmsTypeById" parameterType="java.lang.Long">
+    UPDATE account
+    SET sms_monthago_type = 1
+    WHERE account_id = #{accountId}
+  </update>
+</mapper>
